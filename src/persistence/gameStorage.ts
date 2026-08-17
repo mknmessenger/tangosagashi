@@ -26,7 +26,11 @@ export const DEFAULT_STORED_STATE: StoredState = {
 const isDifficulty = (value: unknown): value is Difficulty =>
   value === 'easy' || value === 'normal';
 const isPreset = (value: unknown): value is BoardPresetKey =>
-  value === 'small' || value === 'medium' || value === 'large';
+  value === 'small' ||
+  value === 'medium' ||
+  value === 'large' ||
+  value === 'extraLarge' ||
+  value === 'space';
 
 function isSavedGame(value: unknown): value is SavedGame {
   if (!value || typeof value !== 'object') return false;

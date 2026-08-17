@@ -3,6 +3,9 @@ import { BOARD_PRESETS, DIRECTIONS } from '../config/gameConfig';
 import { DECOY_COUNT_BY_PRESET } from '../config/decoyConfig';
 import { POKEMON_CATALOG, STARTER_NAMES } from '../data/pokemonCatalog';
 import { countWordOccurrences, createPuzzle, createSeededRandom } from './puzzleGenerator';
+import type { BoardPresetKey } from './types';
+
+const PRESETS = Object.keys(BOARD_PRESETS) as BoardPresetKey[];
 
 describe('createPuzzle', () => {
   it('creates the small preset with four placed targets', () => {
@@ -17,35 +20,39 @@ describe('createPuzzle', () => {
     expect(puzzle.targets).toHaveLength(BOARD_PRESETS.small.targetCount);
   });
 
-  it.each(['small', 'medium', 'large'] as const)(
-    'places each target into the grid for the %s preset',
-    (preset) => {
-      const puzzle = createPuzzle({
-        difficulty: 'normal',
-        preset,
-        random: createSeededRandom(100 + BOARD_PRESETS[preset].size),
-      });
+  it.each(PRESETS)('places each target into the grid for the %s preset', (preset) => {
+    const puzzle = createPuzzle({
+      difficulty: 'normal',
+      preset,
+      random: createSeededRandom(100 + BOARD_PRESETS[preset].size),
+    });
 
-      for (const target of puzzle.targets) {
-        const placedWord = target.cells.map((cell) => puzzle.grid[cell.row][cell.column]).join('');
-        expect(placedWord).toBe(target.normalizedName);
-        expect(countWordOccurrences(puzzle.grid, target.normalizedName)).toBe(1);
-      }
+    for (const target of puzzle.targets) {
+      const placedWord = target.cells.map((cell) => puzzle.grid[cell.row][cell.column]).join('');
+      expect(placedWord).toBe(target.normalizedName);
+      expect(countWordOccurrences(puzzle.grid, target.normalizedName)).toBe(1);
+    }
 
-      expect(puzzle.decoys).toHaveLength(DECOY_COUNT_BY_PRESET[preset]);
-      const catalogNames = new Set(POKEMON_CATALOG.map((pokemon) => pokemon.normalizedName));
-      for (const decoy of puzzle.decoys) {
-        const placedWord = decoy.cells.map((cell) => puzzle.grid[cell.row][cell.column]).join('');
-        const differenceCount = Array.from(decoy.decoyWord).filter(
-          (character, index) => character !== decoy.normalizedSourceName[index],
-        ).length;
-        expect(placedWord).toBe(decoy.decoyWord);
-        expect(decoy.decoyWord).toHaveLength(decoy.normalizedSourceName.length);
-        expect(differenceCount).toBe(1);
-        expect(catalogNames.has(decoy.decoyWord)).toBe(false);
-      }
-    },
-  );
+    expect(puzzle.decoys).toHaveLength(DECOY_COUNT_BY_PRESET[preset]);
+    const catalogNames = new Set(POKEMON_CATALOG.map((pokemon) => pokemon.normalizedName));
+    for (const decoy of puzzle.decoys) {
+      const placedWord = decoy.cells.map((cell) => puzzle.grid[cell.row][cell.column]).join('');
+      const differenceCount = Array.from(decoy.decoyWord).filter(
+        (character, index) => character !== decoy.normalizedSourceName[index],
+      ).length;
+      expect(placedWord).toBe(decoy.decoyWord);
+      expect(decoy.decoyWord).toHaveLength(decoy.normalizedSourceName.length);
+      expect(differenceCount).toBe(1);
+      expect(catalogNames.has(decoy.decoyWord)).toBe(false);
+    }
+  });
+
+  it('uses the requested extra-large and space presets', () => {
+    expect(BOARD_PRESETS.extraLarge).toEqual({ label: '特大', size: 12, targetCount: 12 });
+    expect(BOARD_PRESETS.space).toEqual({ label: '宇宙', size: 16, targetCount: 16 });
+    expect(DECOY_COUNT_BY_PRESET.extraLarge).toBe(5);
+    expect(DECOY_COUNT_BY_PRESET.space).toBe(10);
+  });
 
   it('uses only the four allowed directions in easy mode', () => {
     const puzzle = createPuzzle({

@@ -1,5 +1,5 @@
 export type Difficulty = 'easy' | 'normal';
-export type BoardPresetKey = 'small' | 'medium' | 'large';
+export type BoardPresetKey = 'small' | 'medium' | 'large' | 'extraLarge' | 'space';
 
 export interface BoardPreset {
   label: string;

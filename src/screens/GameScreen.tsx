@@ -34,6 +34,10 @@ const TARGET_COLORS = [
   '#b5c6d8',
   '#d8b58f',
   '#a7d7a9',
+  '#ef8f8f',
+  '#73c6a4',
+  '#9da7df',
+  '#e7a9d2',
 ] as const;
 
 function backgroundFor(colors: readonly string[]): string | undefined {

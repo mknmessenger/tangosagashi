@@ -112,7 +112,7 @@ h1 {
 }
 
 .size-choices {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(5.6rem, 1fr));
 }
 
 .choice-button,

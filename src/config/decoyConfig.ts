@@ -5,4 +5,6 @@ export const DECOY_COUNT_BY_PRESET: Readonly<Record<BoardPresetKey, number>> = {
   small: 1,
   medium: 2,
   large: 3,
+  extraLarge: 5,
+  space: 10,
 };

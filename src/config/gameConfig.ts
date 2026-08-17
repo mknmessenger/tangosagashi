@@ -1,9 +1,11 @@
 import type { BoardPreset, BoardPresetKey, Difficulty, Direction } from '../domain/types';
 
 export const BOARD_PRESETS: Record<BoardPresetKey, BoardPreset> = {
-  small: { label: '小', size: 8, targetCount: 4 },
-  medium: { label: '中', size: 12, targetCount: 8 },
-  large: { label: '大', size: 16, targetCount: 12 },
+  small: { label: '小', size: 6, targetCount: 4 },
+  medium: { label: '中', size: 8, targetCount: 6 },
+  large: { label: '大', size: 10, targetCount: 8 },
+  extraLarge: { label: '特大', size: 12, targetCount: 12 },
+  space: { label: '宇宙', size: 16, targetCount: 16 },
 };
 
 export const DIFFICULTY_LABELS: Record<Difficulty, string> = {

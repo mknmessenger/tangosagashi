@@ -22,6 +22,17 @@ test('opens settings and confirms before resetting the record', async ({ page })
   await expect(page.getByRole('dialog')).toHaveCount(0);
 });
 
+test('starts the space preset with sixteen targets without overflow', async ({ page }) => {
+  await page.getByRole('button', { name: /宇宙/ }).click();
+  await page.getByRole('button', { name: 'ゲームスタート' }).click();
+  await expect(page.getByRole('gridcell')).toHaveCount(256);
+  await expect(page.getByText('0 / 16')).toBeVisible();
+  await expect(
+    page.getByRole('list', { name: 'さがすポケモン' }).getByRole('listitem'),
+  ).toHaveCount(16);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});
+
 test('finds a target by dragging and resumes after reload', async ({ page }) => {
   await page.getByRole('button', { name: 'ゲームスタート' }).click();
   const path = await page.evaluate(() => {
