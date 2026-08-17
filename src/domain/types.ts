@@ -21,6 +21,7 @@ export interface PokemonEntry {
   id: string;
   displayName: string;
   normalizedName: string;
+  isStarter: boolean;
 }
 
 export interface PlacedTarget extends PokemonEntry {
@@ -28,11 +29,23 @@ export interface PlacedTarget extends PokemonEntry {
 }
 
 export interface Puzzle {
+  id: string;
   size: number;
   difficulty: Difficulty;
   preset: BoardPresetKey;
   grid: string[][];
   targets: PlacedTarget[];
+}
+
+export interface GameSettings {
+  difficulty: Difficulty;
+  preset: BoardPresetKey;
+  soundEnabled: boolean;
+}
+
+export interface SavedGame {
+  puzzle: Puzzle;
+  foundTargetIds: string[];
 }
 
 export interface CreatePuzzleOptions {

@@ -30,3 +30,6 @@
 | D-026 | Web App Manifestを用意するが、MVPではService Workerを導入しない | Accepted | S-001 |
 | D-027 | Inception成果物を承認し、Constructionへ進む | Accepted | S-001 |
 | D-028 | Bolt 1 Walking Skeletonを承認する | Accepted | S-001 |
+| D-029 | Bolt 2以降は自律進行とし、検証失敗時のみ停止する | Accepted | S-001 |
+| D-030 | 第10世代として公式発表済みのハブロウ・ポムケン・ミオリーを必須候補へ含める | Accepted | S-001 |
+| D-031 | GitHub認証が復旧するまで公開操作を保留し、ローカルのリリース検証まで完了する | Accepted | S-001 |

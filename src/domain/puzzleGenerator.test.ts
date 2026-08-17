@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { BOARD_PRESETS, DIRECTIONS } from '../config/gameConfig';
-import { createPuzzle, createSeededRandom } from './puzzleGenerator';
+import { POKEMON_CATALOG, STARTER_NAMES } from '../data/pokemonCatalog';
+import { countWordOccurrences, createPuzzle, createSeededRandom } from './puzzleGenerator';
 
 describe('createPuzzle', () => {
   it('creates the small preset with four placed targets', () => {
@@ -27,6 +28,7 @@ describe('createPuzzle', () => {
       for (const target of puzzle.targets) {
         const placedWord = target.cells.map((cell) => puzzle.grid[cell.row][cell.column]).join('');
         expect(placedWord).toBe(target.normalizedName);
+        expect(countWordOccurrences(puzzle.grid, target.normalizedName)).toBe(1);
       }
     },
   );
@@ -46,6 +48,16 @@ describe('createPuzzle', () => {
       const second = target.cells[1];
       const direction = `${second.row - first.row},${second.column - first.column}`;
       expect(allowed.has(direction)).toBe(true);
+    }
+  });
+
+  it('contains roughly one hundred distinct candidates and every starter', () => {
+    expect(POKEMON_CATALOG.length).toBeGreaterThanOrEqual(95);
+    expect(new Set(POKEMON_CATALOG.map((pokemon) => pokemon.displayName)).size).toBe(
+      POKEMON_CATALOG.length,
+    );
+    for (const starter of STARTER_NAMES) {
+      expect(POKEMON_CATALOG.some((pokemon) => pokemon.displayName === starter)).toBe(true);
     }
   });
 });

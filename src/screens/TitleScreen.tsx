@@ -8,6 +8,7 @@ interface TitleScreenProps {
   onDifficultyChange: (difficulty: Difficulty) => void;
   onPresetChange: (preset: BoardPresetKey) => void;
   onStart: () => void;
+  onSettings: () => void;
 }
 
 const DIFFICULTIES = Object.keys(DIFFICULTY_LABELS) as Difficulty[];
@@ -20,6 +21,7 @@ export function TitleScreen({
   onDifficultyChange,
   onPresetChange,
   onStart,
+  onSettings,
 }: TitleScreenProps) {
   return (
     <main className="app-frame title-screen">
@@ -84,8 +86,8 @@ export function TitleScreen({
       <button type="button" className="primary-button" onClick={onStart}>
         ゲームスタート
       </button>
-      <button type="button" className="text-button" disabled>
-        せってい（つぎのBoltで追加）
+      <button type="button" className="text-button" onClick={onSettings}>
+        せってい
       </button>
     </main>
   );

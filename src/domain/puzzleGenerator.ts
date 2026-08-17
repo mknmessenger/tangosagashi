@@ -10,6 +10,7 @@ import type {
 } from './types';
 
 const MAX_PUZZLE_ATTEMPTS = 50;
+const MAX_FILL_ATTEMPTS = 100;
 
 function shuffled<T>(values: readonly T[], random: () => number): T[] {
   const result = [...values];
@@ -83,6 +84,35 @@ function fillEmptyCells(grid: (string | null)[][], random: () => number): string
   );
 }
 
+export function countWordOccurrences(grid: readonly string[][], word: string): number {
+  let occurrences = 0;
+  for (let row = 0; row < grid.length; row += 1) {
+    for (let column = 0; column < grid.length; column += 1) {
+      for (const direction of DIRECTIONS.normal) {
+        const cells = cellsForWord(grid.length, { row, column }, direction, word.length);
+        if (cells && cells.map((cell) => grid[cell.row][cell.column]).join('') === word) {
+          occurrences += 1;
+        }
+      }
+    }
+  }
+  return occurrences;
+}
+
+function fillWithoutDuplicateTargets(
+  grid: (string | null)[][],
+  targets: readonly PlacedTarget[],
+  random: () => number,
+): string[][] | null {
+  for (let attempt = 0; attempt < MAX_FILL_ATTEMPTS; attempt += 1) {
+    const filled = fillEmptyCells(grid, random);
+    if (targets.every((target) => countWordOccurrences(filled, target.normalizedName) === 1)) {
+      return filled;
+    }
+  }
+  return null;
+}
+
 export function createPuzzle({
   difficulty,
   preset,
@@ -113,11 +143,14 @@ export function createPuzzle({
     }
 
     if (targets.length === config.targetCount) {
+      const filledGrid = fillWithoutDuplicateTargets(grid, targets, random);
+      if (!filledGrid) continue;
       return {
+        id: `puzzle-${Date.now()}-${Math.floor(random() * 1_000_000)}`,
         size: config.size,
         difficulty,
         preset,
-        grid: fillEmptyCells(grid, random),
+        grid: filledGrid,
         targets,
       };
     }
