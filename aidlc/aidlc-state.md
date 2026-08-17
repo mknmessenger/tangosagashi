@@ -6,10 +6,10 @@
 - Active space: `tangosagashi`
 - Active intent: `260817-pokemon-word-search`
 - Current phase: Construction
-- Current stage: Bolt 1 — Walking Skeleton
+- Current stage: Bolt 1 — Walking Skeleton approval gate
 - Verification gate: Inception → Construction passed on 2026-08-18
 - Construction autonomy mode: Not selected
-- Last updated: 2026-08-17
+- Last updated: 2026-08-18
 
 ## Phase status
 
