@@ -520,10 +520,10 @@ h1 {
 }
 
 .confetti {
-  position: absolute;
-  z-index: 5;
-  inset: -1rem 0 auto;
-  height: 10rem;
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  height: 100vh;
   pointer-events: none;
   overflow: hidden;
 }
@@ -572,7 +572,7 @@ h1 {
   }
   to {
     opacity: 0;
-    transform: translate(var(--confetti-drift), 10rem) rotate(480deg);
+    transform: translate(var(--confetti-drift), 92vh) rotate(600deg);
   }
 }
 

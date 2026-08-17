@@ -15,9 +15,9 @@ export function Confetti({ large = false }: ConfettiProps) {
             {
               '--confetti-index': index,
               '--confetti-x': `${(index * 37) % 100}%`,
-              '--confetti-delay': `${(index % 24) * 0.045}s`,
+              '--confetti-delay': `${large ? (index % 18) * 0.03 : (index % 24) * 0.045}s`,
               '--confetti-drift': `${((index * 29) % 120) - 60}px`,
-              '--confetti-duration': `${1.4 + (index % 9) * 0.12}s`,
+              '--confetti-duration': `${large ? 1.8 + (index % 9) * 0.08 : 2.2 + (index % 9) * 0.14}s`,
               '--confetti-size': `${0.38 + (index % 5) * 0.08}rem`,
               '--confetti-height': `${0.65 + (index % 6) * 0.1}rem`,
             } as CSSProperties

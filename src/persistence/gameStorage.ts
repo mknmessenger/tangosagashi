@@ -1,4 +1,5 @@
 import type { BoardPresetKey, Difficulty, GameSettings, SavedGame } from '../domain/types';
+import { POKEMON_CATALOG } from '../data/pokemonCatalog';
 
 const STORAGE_KEY = 'tangosagashi:v1';
 const DEFAULT_SETTINGS: GameSettings = {
@@ -6,6 +7,7 @@ const DEFAULT_SETTINGS: GameSettings = {
   preset: 'small',
   soundEnabled: true,
 };
+const catalogNames = new Set(POKEMON_CATALOG.map((pokemon) => pokemon.displayName));
 
 export interface StoredState {
   version: 1;
@@ -45,6 +47,9 @@ function isSavedGame(value: unknown): value is SavedGame {
         row.every((cell) => typeof cell === 'string'),
     ) &&
     Array.isArray(puzzle.targets) &&
+    puzzle.targets.every(
+      (target) => target && typeof target === 'object' && catalogNames.has(target.displayName),
+    ) &&
     Array.isArray(game.foundTargetIds) &&
     game.foundTargetIds.every((id) => typeof id === 'string'),
   );

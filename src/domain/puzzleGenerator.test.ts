@@ -52,12 +52,18 @@ describe('createPuzzle', () => {
   });
 
   it('contains roughly one hundred distinct candidates and every starter', () => {
-    expect(POKEMON_CATALOG.length).toBeGreaterThanOrEqual(95);
+    expect(POKEMON_CATALOG).toHaveLength(108);
+    expect(STARTER_NAMES).toHaveLength(27);
     expect(new Set(POKEMON_CATALOG.map((pokemon) => pokemon.displayName)).size).toBe(
       POKEMON_CATALOG.length,
     );
     for (const starter of STARTER_NAMES) {
       expect(POKEMON_CATALOG.some((pokemon) => pokemon.displayName === starter)).toBe(true);
+    }
+    for (const unreleasedStarter of ['ハブロウ', 'ポムケン', 'ミオリー']) {
+      expect(POKEMON_CATALOG.some((pokemon) => pokemon.displayName === unreleasedStarter)).toBe(
+        false,
+      );
     }
   });
 });

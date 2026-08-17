@@ -1,7 +1,7 @@
 import type { PokemonEntry } from '../domain/types';
 import { normalizePokemonName } from '../domain/nameNormalizer';
 
-// 本編第1〜10世代で「最初のパートナー」として発表された30匹。
+// 発売済みの本編第1〜9世代で「最初のパートナー」となった27匹。
 export const STARTER_NAMES = [
   'フシギダネ',
   'ヒトカゲ',
@@ -30,9 +30,6 @@ export const STARTER_NAMES = [
   'ニャオハ',
   'ホゲータ',
   'クワッス',
-  'ハブロウ',
-  'ポムケン',
-  'ミオリー',
 ] as const;
 
 // 家族で名前を認識しやすいこと、世代の偏り、名前の長さを見ながら選んだ候補。
