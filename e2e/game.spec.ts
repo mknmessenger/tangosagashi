@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { BOARD_PRESETS } from '../src/config/gameConfig';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
@@ -8,8 +9,8 @@ test.beforeEach(async ({ page }) => {
 
 test('starts a small game without horizontal overflow', async ({ page }) => {
   await page.getByRole('button', { name: 'ゲームスタート' }).click();
-  await expect(page.getByRole('gridcell')).toHaveCount(64);
-  await expect(page.getByText('0 / 4')).toBeVisible();
+  await expect(page.getByRole('gridcell')).toHaveCount(BOARD_PRESETS.small.size ** 2);
+  await expect(page.getByText(`0 / ${BOARD_PRESETS.small.targetCount}`)).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });
 
@@ -82,7 +83,7 @@ test('finds a target by dragging and resumes after reload', async ({ page }) => 
   await page.mouse.move(endBox.x + endBox.width / 2, endBox.y + endBox.height / 2, { steps: 5 });
   await page.mouse.up();
 
-  await expect(page.getByText('1 / 4')).toBeVisible();
+  await expect(page.getByText(`1 / ${BOARD_PRESETS.small.targetCount}`)).toBeVisible();
   await page.reload();
-  await expect(page.getByText('1 / 4')).toBeVisible();
+  await expect(page.getByText(`1 / ${BOARD_PRESETS.small.targetCount}`)).toBeVisible();
 });

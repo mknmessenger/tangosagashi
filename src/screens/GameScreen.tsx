@@ -1,4 +1,5 @@
 import {
+  useEffect,
   useRef,
   useState,
   type CSSProperties,
@@ -13,8 +14,11 @@ import type { Coordinate, SavedGame } from '../domain/types';
 interface GameScreenProps {
   game: SavedGame;
   soundEnabled: boolean;
+  totalFound: number;
   onFound: (targetId: string) => void;
   onBack: () => void;
+  onReplay: () => void;
+  onTitle: () => void;
 }
 
 const TARGET_COLORS = [
@@ -41,16 +45,32 @@ function backgroundFor(colors: readonly string[]): string | undefined {
     .join(', ')})`;
 }
 
-export function GameScreen({ game, soundEnabled, onFound, onBack }: GameScreenProps) {
+export function GameScreen({
+  game,
+  soundEnabled,
+  totalFound,
+  onFound,
+  onBack,
+  onReplay,
+  onTitle,
+}: GameScreenProps) {
   const { puzzle, foundTargetIds } = game;
+  const isComplete = foundTargetIds.length === puzzle.targets.length;
   const gridRef = useRef<HTMLDivElement>(null);
   const dragStart = useRef<Coordinate | null>(null);
   const selectionRef = useRef<Coordinate[]>([]);
   const [selection, setSelection] = useState<Coordinate[]>([]);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const [feedback, setFeedback] = useState<{ kind: 'success' | 'wrong'; key: number } | null>(null);
+  const [showCompletionOverlay, setShowCompletionOverlay] = useState(isComplete);
   const gridStyle = { '--grid-size': puzzle.size } as CSSProperties;
   const selectedKeys = new Set(selection.map(coordinateKey));
+
+  useEffect(() => {
+    if (!showCompletionOverlay) return;
+    const timer = window.setTimeout(() => setShowCompletionOverlay(false), 3200);
+    return () => window.clearTimeout(timer);
+  }, [showCompletionOverlay, puzzle.id]);
 
   const coordinateFromPoint = (clientX: number, clientY: number): Coordinate | null => {
     const element = document
@@ -70,6 +90,7 @@ export function GameScreen({ game, soundEnabled, onFound, onBack }: GameScreenPr
   };
 
   const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (isComplete) return;
     const start = coordinateFromPoint(event.clientX, event.clientY);
     if (!start) return;
     event.currentTarget.setPointerCapture(event.pointerId);
@@ -94,7 +115,8 @@ export function GameScreen({ game, soundEnabled, onFound, onBack }: GameScreenPr
       const completesGame = foundTargetIds.length + 1 === puzzle.targets.length;
       if (completesGame) playCompleteSound(soundEnabled);
       else playFoundSound(soundEnabled);
-      setFeedback({ kind: 'success', key: Date.now() });
+      if (completesGame) setShowCompletionOverlay(true);
+      else setFeedback({ kind: 'success', key: Date.now() });
       onFound(match.id);
     } else if (path.length > 1) {
       setFeedback({ kind: 'wrong', key: Date.now() });
@@ -120,6 +142,15 @@ export function GameScreen({ game, soundEnabled, onFound, onBack }: GameScreenPr
 
       <div className="grid-stage">
         {feedback?.kind === 'success' && <Confetti key={feedback.key} />}
+        {showCompletionOverlay && (
+          <>
+            <Confetti large />
+            <div className="completion-overlay" role="status" aria-live="assertive">
+              <span>ぜんぶ みつけた！</span>
+              <strong>クリア！</strong>
+            </div>
+          </>
+        )}
         <div
           ref={gridRef}
           className={`word-grid word-grid--${puzzle.size} ${feedback?.kind === 'wrong' ? 'word-grid--shake' : ''}`}
@@ -180,6 +211,29 @@ export function GameScreen({ game, soundEnabled, onFound, onBack }: GameScreenPr
           );
         })}
       </ul>
+
+      {isComplete && !showCompletionOverlay && (
+        <section className="completion-actions" aria-label="クリア後のメニュー">
+          <div className="completion-actions__stats">
+            <p>
+              <span>こんかい</span>
+              <strong>{foundTargetIds.length}ひき</strong>
+            </p>
+            <p>
+              <span>ぜんぶで</span>
+              <strong>{totalFound}ひき</strong>
+            </p>
+          </div>
+          <div className="completion-actions__buttons">
+            <button type="button" className="primary-button" onClick={onReplay}>
+              もういっかい
+            </button>
+            <button type="button" className="text-button" onClick={onTitle}>
+              タイトルに もどる
+            </button>
+          </div>
+        </section>
+      )}
 
       {showExitDialog && (
         <ConfirmDialog

@@ -2,12 +2,11 @@ import { useEffect, useReducer } from 'react';
 import { createPuzzle } from './domain/puzzleGenerator';
 import type { BoardPresetKey, Difficulty, GameSettings, SavedGame } from './domain/types';
 import { loadStoredState, saveStoredState } from './persistence/gameStorage';
-import { CompleteScreen } from './screens/CompleteScreen';
 import { GameScreen } from './screens/GameScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { TitleScreen } from './screens/TitleScreen';
 
-type Screen = 'title' | 'game' | 'settings' | 'complete';
+type Screen = 'title' | 'game' | 'settings';
 
 interface AppState {
   screen: Screen;
@@ -29,11 +28,7 @@ type Action =
 function initialState(): AppState {
   const stored = loadStoredState();
   return {
-    screen: stored.activeGame
-      ? stored.activeGame.foundTargetIds.length === stored.activeGame.puzzle.targets.length
-        ? 'complete'
-        : 'game'
-      : 'title',
+    screen: stored.activeGame ? 'game' : 'title',
     settings: stored.settings,
     totalFound: stored.totalFound,
     activeGame: stored.activeGame,
@@ -56,8 +51,7 @@ function reducer(state: AppState, action: Action): AppState {
       const foundTargetIds = [...state.activeGame.foundTargetIds, action.targetId];
       return {
         ...state,
-        screen:
-          foundTargetIds.length === state.activeGame.puzzle.targets.length ? 'complete' : 'game',
+        screen: 'game',
         totalFound: state.totalFound + 1,
         activeGame: { ...state.activeGame, foundTargetIds },
       };
@@ -95,17 +89,9 @@ export function App() {
       <GameScreen
         game={state.activeGame}
         soundEnabled={state.settings.soundEnabled}
+        totalFound={state.totalFound}
         onFound={(targetId) => dispatch({ type: 'found', targetId })}
         onBack={() => dispatch({ type: 'showTitle' })}
-      />
-    );
-  }
-
-  if (state.screen === 'complete' && state.activeGame) {
-    return (
-      <CompleteScreen
-        foundThisGame={state.activeGame.foundTargetIds.length}
-        totalFound={state.totalFound}
         onReplay={startGame}
         onTitle={() => dispatch({ type: 'showTitle' })}
       />

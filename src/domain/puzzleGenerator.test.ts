@@ -11,9 +11,9 @@ describe('createPuzzle', () => {
       random: createSeededRandom(42),
     });
 
-    expect(puzzle.grid).toHaveLength(8);
-    expect(puzzle.grid.every((row) => row.length === 8)).toBe(true);
-    expect(puzzle.targets).toHaveLength(4);
+    expect(puzzle.grid).toHaveLength(BOARD_PRESETS.small.size);
+    expect(puzzle.grid.every((row) => row.length === BOARD_PRESETS.small.size)).toBe(true);
+    expect(puzzle.targets).toHaveLength(BOARD_PRESETS.small.targetCount);
   });
 
   it.each(['small', 'medium', 'large'] as const)(
