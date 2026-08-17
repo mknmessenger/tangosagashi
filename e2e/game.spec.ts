@@ -7,6 +7,27 @@ test.beforeEach(async ({ page }) => {
   await page.reload();
 });
 
+test('fits the title screen within the portrait viewport', async ({ page }) => {
+  const settingsButton = page.getByRole('button', { name: 'せってい' });
+  await expect(settingsButton).toBeVisible();
+
+  const measurements = await page.evaluate(() => {
+    const settingsButton = [...document.querySelectorAll('button')].find((button) =>
+      button.textContent?.includes('せってい'),
+    );
+    const settingsRect = settingsButton?.getBoundingClientRect();
+    return {
+      viewportHeight: visualViewport?.height ?? innerHeight,
+      settingsTop: settingsRect?.top ?? Number.POSITIVE_INFINITY,
+      settingsBottom: settingsRect?.bottom ?? Number.POSITIVE_INFINITY,
+    };
+  });
+
+  expect(measurements.settingsTop).toBeGreaterThanOrEqual(0);
+  expect(measurements.settingsBottom).toBeLessThanOrEqual(measurements.viewportHeight);
+  await expect(settingsButton).toBeInViewport();
+});
+
 test('starts a small game without horizontal overflow', async ({ page }) => {
   await page.getByRole('button', { name: 'ゲームスタート' }).click();
   await expect(page.getByRole('gridcell')).toHaveCount(BOARD_PRESETS.small.size ** 2);

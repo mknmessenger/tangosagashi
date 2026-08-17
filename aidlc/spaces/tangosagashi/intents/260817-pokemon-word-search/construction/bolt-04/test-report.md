@@ -5,6 +5,7 @@ Status: Pass on 2026-08-18
 | Verification | Result |
 |---|---|
 | iPhone幅390×844で横方向のはみ出しなし | Pass |
+| iPhone 13・iPad Miniの縦表示でタイトル画面全体が表示領域内に収まる | Pass |
 | タイトル画面に小・中・大・特大・宇宙の5段階を表示 | Pass |
 | 宇宙16×16を256マス・16匹で表示し、iPhone/iPadで横方向のはみ出しなし | Pass |
 | 中盤面8匹を実ブラウザですべて発見 | Pass |
