@@ -1,9 +1,11 @@
 import { BOARD_PRESETS, DIRECTIONS, FILLER_CHARACTERS } from '../config/gameConfig';
+import { DECOY_COUNT_BY_PRESET } from '../config/decoyConfig';
 import { POKEMON_CATALOG } from '../data/pokemonCatalog';
 import type {
   Coordinate,
   CreatePuzzleOptions,
   Direction,
+  PlacedDecoy,
   PlacedTarget,
   PokemonEntry,
   Puzzle,
@@ -11,6 +13,7 @@ import type {
 
 const MAX_PUZZLE_ATTEMPTS = 50;
 const MAX_FILL_ATTEMPTS = 100;
+const CATALOG_NAMES = new Set(POKEMON_CATALOG.map((pokemon) => pokemon.normalizedName));
 
 function shuffled<T>(values: readonly T[], random: () => number): T[] {
   const result = [...values];
@@ -45,12 +48,12 @@ function canPlace(grid: (string | null)[][], word: string, cells: readonly Coord
   });
 }
 
-function placeTarget(
+function placeWord(
   grid: (string | null)[][],
-  pokemon: PokemonEntry,
+  word: string,
   directions: readonly Direction[],
   random: () => number,
-): PlacedTarget | null {
+): Coordinate[] | null {
   const size = grid.length;
   const starts = shuffled(
     Array.from({ length: size * size }, (_, index) => ({
@@ -64,16 +67,50 @@ function placeTarget(
   );
 
   for (const { start, direction } of placements) {
-    const cells = cellsForWord(size, start, direction, pokemon.normalizedName.length);
-    if (!cells || !canPlace(grid, pokemon.normalizedName, cells)) continue;
+    const cells = cellsForWord(size, start, direction, word.length);
+    if (!cells || !canPlace(grid, word, cells)) continue;
 
     cells.forEach((cell, index) => {
-      grid[cell.row][cell.column] = pokemon.normalizedName[index];
+      grid[cell.row][cell.column] = word[index];
     });
-    return { ...pokemon, cells };
+    return cells;
   }
 
   return null;
+}
+
+function placeTarget(
+  grid: (string | null)[][],
+  pokemon: PokemonEntry,
+  directions: readonly Direction[],
+  random: () => number,
+): PlacedTarget | null {
+  const cells = placeWord(grid, pokemon.normalizedName, directions, random);
+  return cells ? { ...pokemon, cells } : null;
+}
+
+function createDecoyWord(pokemon: PokemonEntry, random: () => number): Omit<PlacedDecoy, 'cells'> {
+  const positions = shuffled(
+    Array.from({ length: pokemon.normalizedName.length }, (_, index) => index),
+    random,
+  );
+  for (const position of positions) {
+    for (const replacement of shuffled(FILLER_CHARACTERS, random)) {
+      if (replacement === pokemon.normalizedName[position]) continue;
+      const characters = Array.from(pokemon.normalizedName);
+      characters[position] = replacement;
+      const decoyWord = characters.join('');
+      if (!CATALOG_NAMES.has(decoyWord)) {
+        return {
+          sourcePokemonId: pokemon.id,
+          sourceName: pokemon.displayName,
+          normalizedSourceName: pokemon.normalizedName,
+          decoyWord,
+        };
+      }
+    }
+  }
+  throw new Error(`Unable to create a decoy for ${pokemon.displayName}.`);
 }
 
 function fillEmptyCells(grid: (string | null)[][], random: () => number): string[][] {
@@ -119,6 +156,7 @@ export function createPuzzle({
   random = Math.random,
 }: CreatePuzzleOptions): Puzzle {
   const config = BOARD_PRESETS[preset];
+  const decoyCount = DECOY_COUNT_BY_PRESET[preset];
   const candidates = POKEMON_CATALOG.filter(
     (pokemon) => pokemon.normalizedName.length <= config.size,
   );
@@ -135,6 +173,7 @@ export function createPuzzle({
       .slice(0, config.targetCount)
       .sort((left, right) => right.normalizedName.length - left.normalizedName.length);
     const targets: PlacedTarget[] = [];
+    const decoys: PlacedDecoy[] = [];
 
     for (const pokemon of selected) {
       const placed = placeTarget(grid, pokemon, DIRECTIONS[difficulty], random);
@@ -142,7 +181,24 @@ export function createPuzzle({
       targets.push(placed);
     }
 
-    if (targets.length === config.targetCount) {
+    if (targets.length !== config.targetCount) continue;
+
+    const selectedIds = new Set(selected.map((pokemon) => pokemon.id));
+    const usedDecoyWords = new Set<string>();
+    for (const pokemon of shuffled(
+      candidates.filter((candidate) => !selectedIds.has(candidate.id)),
+      random,
+    )) {
+      const decoy = createDecoyWord(pokemon, random);
+      if (usedDecoyWords.has(decoy.decoyWord)) continue;
+      const cells = placeWord(grid, decoy.decoyWord, DIRECTIONS[difficulty], random);
+      if (!cells) continue;
+      usedDecoyWords.add(decoy.decoyWord);
+      decoys.push({ ...decoy, cells });
+      if (decoys.length === decoyCount) break;
+    }
+
+    if (decoys.length === decoyCount) {
       const filledGrid = fillWithoutDuplicateTargets(grid, targets, random);
       if (!filledGrid) continue;
       return {
@@ -152,6 +208,7 @@ export function createPuzzle({
         preset,
         grid: filledGrid,
         targets,
+        decoys,
       };
     }
   }

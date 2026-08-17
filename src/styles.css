@@ -540,24 +540,6 @@ h1 {
   animation: confetti-fall var(--confetti-duration) var(--confetti-delay) ease-out both;
 }
 
-.confetti i:nth-child(4n + 2) {
-  --confetti-color: #4daea1;
-}
-.confetti i:nth-child(4n + 3) {
-  --confetti-color: #efbd48;
-}
-.confetti i:nth-child(4n) {
-  --confetti-color: #6d8fd0;
-}
-
-.confetti i:nth-child(5n) {
-  border-radius: 50%;
-}
-
-.confetti i:nth-child(6n) {
-  --confetti-color: #d56db0;
-}
-
 .confetti--large {
   position: fixed;
   z-index: 30;
@@ -568,11 +550,11 @@ h1 {
 @keyframes confetti-fall {
   from {
     opacity: 1;
-    transform: translateY(0) rotate(0deg);
+    transform: translateY(0) rotate(var(--confetti-start-rotation));
   }
   to {
     opacity: 0;
-    transform: translate(var(--confetti-drift), 92vh) rotate(600deg);
+    transform: translate(var(--confetti-drift), 92vh) rotate(var(--confetti-spin));
   }
 }
 
@@ -583,11 +565,11 @@ h1 {
 @keyframes confetti-fall-large {
   from {
     opacity: 1;
-    transform: translateY(0) rotate(0deg);
+    transform: translateY(0) rotate(var(--confetti-start-rotation));
   }
   to {
     opacity: 0;
-    transform: translate(var(--confetti-drift), 100vh) rotate(720deg);
+    transform: translate(var(--confetti-drift), 100vh) rotate(var(--confetti-spin));
   }
 }
 

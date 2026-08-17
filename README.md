@@ -18,9 +18,12 @@ iPhone/iPadのSafariで公開URLを開き、「共有」→「ホーム画面に
 ## 開発者向け設定
 
 - 盤面サイズと出題数: [`src/config/gameConfig.ts`](src/config/gameConfig.ts)
+- 一文字違いのニアミス語数: [`src/config/decoyConfig.ts`](src/config/decoyConfig.ts)
 - 出題候補: [`src/data/pokemonCatalog.ts`](src/data/pokemonCatalog.ts)
 
 候補は公式人気投票の順位ではなく、発売済みの第1〜9世代の最初のパートナー27匹を必須とし、親しみやすさ・世代・名前の長さを考慮して選んだ108匹です。数字、記号、フォルム名は含めていません。
+
+各問題には、出題対象ではない候補名からちょうど1文字だけ変更したニアミス語をランダムに混ぜます。初期値は小1個・中2個・大3個です。
 
 ## 品質チェック
 

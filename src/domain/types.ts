@@ -28,6 +28,14 @@ export interface PlacedTarget extends PokemonEntry {
   cells: Coordinate[];
 }
 
+export interface PlacedDecoy {
+  sourcePokemonId: string;
+  sourceName: string;
+  normalizedSourceName: string;
+  decoyWord: string;
+  cells: Coordinate[];
+}
+
 export interface Puzzle {
   id: string;
   size: number;
@@ -35,6 +43,7 @@ export interface Puzzle {
   preset: BoardPresetKey;
   grid: string[][];
   targets: PlacedTarget[];
+  decoys: PlacedDecoy[];
 }
 
 export interface GameSettings {

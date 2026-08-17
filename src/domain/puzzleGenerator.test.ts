@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { BOARD_PRESETS, DIRECTIONS } from '../config/gameConfig';
+import { DECOY_COUNT_BY_PRESET } from '../config/decoyConfig';
 import { POKEMON_CATALOG, STARTER_NAMES } from '../data/pokemonCatalog';
 import { countWordOccurrences, createPuzzle, createSeededRandom } from './puzzleGenerator';
 
@@ -29,6 +30,19 @@ describe('createPuzzle', () => {
         const placedWord = target.cells.map((cell) => puzzle.grid[cell.row][cell.column]).join('');
         expect(placedWord).toBe(target.normalizedName);
         expect(countWordOccurrences(puzzle.grid, target.normalizedName)).toBe(1);
+      }
+
+      expect(puzzle.decoys).toHaveLength(DECOY_COUNT_BY_PRESET[preset]);
+      const catalogNames = new Set(POKEMON_CATALOG.map((pokemon) => pokemon.normalizedName));
+      for (const decoy of puzzle.decoys) {
+        const placedWord = decoy.cells.map((cell) => puzzle.grid[cell.row][cell.column]).join('');
+        const differenceCount = Array.from(decoy.decoyWord).filter(
+          (character, index) => character !== decoy.normalizedSourceName[index],
+        ).length;
+        expect(placedWord).toBe(decoy.decoyWord);
+        expect(decoy.decoyWord).toHaveLength(decoy.normalizedSourceName.length);
+        expect(differenceCount).toBe(1);
+        expect(catalogNames.has(decoy.decoyWord)).toBe(false);
       }
     },
   );
