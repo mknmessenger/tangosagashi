@@ -29,3 +29,4 @@
 | D-025 | 公開GitHubリポジトリとGitHub Pagesを利用する | Accepted | S-001 |
 | D-026 | Web App Manifestを用意するが、MVPではService Workerを導入しない | Accepted | S-001 |
 | D-027 | Inception成果物を承認し、Constructionへ進む | Accepted | S-001 |
+| D-028 | Bolt 1 Walking Skeletonを承認する | Accepted | S-001 |
